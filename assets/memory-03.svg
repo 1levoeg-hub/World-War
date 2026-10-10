@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="رسالة مكتوبة بجوار زهرة مجففة">
+  <defs>
+    <linearGradient id="table" x2="0" y2="1">
+      <stop stop-color="#bd9a70"/>
+      <stop offset="1" stop-color="#765541"/>
+    </linearGradient>
+    <linearGradient id="envelope" x2="1" y2="1">
+      <stop stop-color="#f0e4c9"/>
+      <stop offset="1" stop-color="#cfb88d"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="13" flood-color="#241b17" flood-opacity=".36"/>
+    </filter>
+  </defs>
+  <rect width="800" height="600" fill="url(#table)"/>
+  <path d="M0 84h800M0 289h800M0 491h800" stroke="#dfbd8e" stroke-width="3" opacity=".2"/>
+  <g transform="rotate(-6 382 304)" filter="url(#shadow)">
+    <rect x="153" y="91" width="454" height="385" rx="6" fill="url(#envelope)"/>
+    <path d="M183 145h390M183 173h342" stroke="#aa9573" stroke-width="4" stroke-linecap="round" opacity=".55"/>
+    <path d="M205 229h340m-340 30h312m-312 30h332m-332 30h256" stroke="#9b8565" stroke-width="5" stroke-linecap="round" opacity=".68"/>
+    <path d="M206 390q80-33 154 0t151 0" fill="none" stroke="#9b5143" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="544" cy="414" r="28" fill="#a74f42" opacity=".88"/>
+    <path d="M531 414h26m-13-13v26" stroke="#f0d7b2" stroke-width="3" opacity=".85"/>
+  </g>
+  <g transform="rotate(12 660 250)">
+    <path d="M655 420q15-126-18-247m17 163q-56-42-75-86m82 108q51-43 77-83" fill="none" stroke="#506348" stroke-width="8" stroke-linecap="round"/>
+    <path d="M634 262q-35-30-53-7 8 36 58 39m35 9q25-46 52-30-1 36-54 58" fill="#73805b"/>
+    <g fill="#b66d62">
+      <circle cx="629" cy="157" r="18"/><circle cx="657" cy="145" r="18"/><circle cx="677" cy="165" r="18"/>
+      <circle cx="661" cy="179" r="18"/><circle cx="642" cy="179" r="18"/>
+    </g>
+    <circle cx="654" cy="164" r="10" fill="#d7b16f"/>
+    <g fill="#d3a16e">
+      <circle cx="611" cy="138" r="8"/><circle cx="691" cy="144" r="7"/><circle cx="682" cy="192" r="7"/>
+    </g>
+  </g>
+  <path d="M80 529q48-26 91 0m-46-37q11 35 34 59" fill="none" stroke="#4f6248" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="83" cy="501" r="9" fill="#b66d62"/>
+  <circle cx="126" cy="489" r="8" fill="#b66d62"/>
+</svg>

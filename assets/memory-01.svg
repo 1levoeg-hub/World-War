@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="دفتر ذكريات وصورة عند الغروب">
+  <defs>
+    <linearGradient id="paper" x2="0" y2="1">
+      <stop stop-color="#e7d8b8"/>
+      <stop offset="1" stop-color="#b99b6a"/>
+    </linearGradient>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#46516a"/>
+      <stop offset=".58" stop-color="#c17d59"/>
+      <stop offset="1" stop-color="#e2b579"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#241b17" flood-opacity=".35"/>
+    </filter>
+  </defs>
+  <rect width="800" height="600" fill="#9b7854"/>
+  <path d="M0 72 800 0v600H0Z" fill="url(#paper)"/>
+  <path d="M0 420 800 335v265H0Z" fill="#8e6947" opacity=".38"/>
+  <g transform="rotate(-7 390 295)" filter="url(#shadow)">
+    <rect x="169" y="72" width="424" height="396" rx="5" fill="#eee4cf"/>
+    <rect x="195" y="98" width="372" height="278" fill="url(#sky)"/>
+    <circle cx="421" cy="240" r="45" fill="#f2d29b"/>
+    <path d="m195 318 95-91 74 72 79-105 124 124v58H195Z" fill="#4d514b"/>
+    <path d="m195 344 117-69 81 53 92-64 81 55v57H195Z" fill="#343d3b"/>
+    <path d="M217 405h188" stroke="#a58d68" stroke-width="5" stroke-linecap="round"/>
+    <path d="M217 426h126" stroke="#c0ab84" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(9 644 441)" filter="url(#shadow)">
+    <rect x="565" y="376" width="130" height="115" rx="4" fill="#e7d6b5"/>
+    <path d="M583 398h94M583 415h75M583 432h87" stroke="#937e5b" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+    <path d="M582 463q26-24 48 0t49 0" fill="none" stroke="#9c5143" stroke-width="3"/>
+  </g>
+  <path d="M81 504q47-32 92 2m-48-41q23 22 39 64m-25-47q-26 4-38 30" fill="none" stroke="#526249" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="85" cy="469" r="9" fill="#b67b65"/>
+  <circle cx="123" cy="447" r="8" fill="#b67b65"/>
+  <circle cx="151" cy="480" r="9" fill="#b67b65"/>
+  <rect width="800" height="600" fill="#6d4935" opacity=".08"/>
+</svg>
