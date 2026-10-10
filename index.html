@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#070708" />
+<title>الملف السري — THE PRIVATE FILE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   THE PRIVATE FILE — الملف السري
+   ============================================================ */
+
+*,*::before,*::after{box-sizing:border-box;}
+
+:root{
+  --bg:#070708;
+  --surface:#111114;
+  --paper:#D8CEB8;
+  --paper-hi:#E9E0CD;
+  --ink:#26241F;
+  --red:#B51F2D;
+  --gray:#88847B;
+  --green:#65B58C;
+
+  --kraft:#9A8862;
+  --kraft-2:#877553;
+  --kraft-light:#B3A077;
+  --kraft-dark:#6E5F3D;
+
+  --page-w: clamp(340px, 52vw, 620px);
+  --page-h: calc(var(--page-w) * 1.36);
+  --fpad: clamp(12px, 1.8vw, 24px);
+
+  --ease: cubic-bezier(.42,.02,.3,1);
+  --ease-open: cubic-bezier(.55,.03,.35,1);
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 760px){
+  :root{
+    --page-w: min(93vw, 430px);
+    --page-h: calc(var(--page-w) * 1.70);
+    --fpad: 10px;
+  }
+}
+
+html,body{height:100%;}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--paper);
+  font-family:'Cairo',system-ui,-apple-system,"Segoe UI",sans-serif;
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overscroll-behavior:none;
+}
+
+button{font-family:inherit;}
+
+/* ---------- Desk / atmosphere ---------- */
+.desk{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(120% 85% at 50% 8%, #191720 0%, #0d0d10 42%, #070708 100%),
+    #070708;
+}
+.desk::after{
+  content:''; position:absolute; inset:0;
+  background-image:var(--grain);
+  opacity:.30; mix-blend-mode:overlay;
+}
+.desk::before{
+  content:''; position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0 2px, transparent 2px 5px);
+  opacity:.5;
+}
+.vignette{
+  position:fixed; inset:0; z-index:4; pointer-events:none;
+  background:radial-gradient(115% 95% at 50% 42%, transparent 42%, rgba(0,0,0,.62) 100%);
+}
+.scanlines{
+  position:fixed; inset:0; z-index:5; pointer-events:none; opacity:.16;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.55) 0 1px, transparent 1px 3px);
+  mix-blend-mode:multiply;
+}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  position:relative; z-index:20; flex:0 0 auto;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding: 12px clamp(12px,3vw,28px);
+  font-family:'Courier Prime',ui-monospace,Menlo,monospace;
+  font-size:10px; letter-spacing:.19em; text-transform:uppercase;
+  color:#67635a;
+  border-bottom:1px solid rgba(216,206,184,.06);
+  background:linear-gradient(180deg, rgba(10,10,12,.9), rgba(10,10,12,.35));
+  backdrop-filter:blur(3px);
+}
+.brand{display:flex; align-items:center; gap:9px; white-space:nowrap; overflow:hidden;}
+.brand .dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--red); box-shadow:0 0 8px rgba(181,31,45,.9);
+  animation:pulse 2.4s infinite; flex:0 0 auto;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.brand b{color:#a7a299; font-weight:700; letter-spacing:.2em;}
+.brand .sep{color:#3a3833;}
+.brand .sub{color:#5c5850; letter-spacing:.18em;}
+@media (max-width:640px){ .brand .sub{display:none;} }
+
+.tools{display:flex; align-items:center; gap:8px; flex:0 0 auto;}
+.tool{
+  background:transparent;
+  border:1px solid rgba(216,206,184,.15);
+  color:#7d7970;
+  font-family:'Courier Prime',monospace;
+  font-size:9px; letter-spacing:.19em; text-transform:uppercase;
+  padding:6px 9px; border-radius:2px; cursor:pointer;
+  transition:.25s ease; white-space:nowrap;
+}
+.tool:hover{border-color:rgba(181,31,45,.65); color:#d8ceb8;}
+.tool:focus-visible{outline:1px solid var(--red); outline-offset:2px;}
+.tool[hidden]{display:none;}
+
+/* ---------- Stage ---------- */
+.stage{
+  position:relative; z-index:10; flex:1 1 auto; min-height:0;
+  display:grid; place-items:center;
+  overflow:hidden;
+  padding: 6px 10px;
+}
+.scaler{
+  position:absolute; left:50%; top:50%;
+  transform: translate(-50%, -50%) scale(var(--s, 1));
+  transform-origin:center center;
+  perspective: 2400px;
+  perspective-origin: 50% 48%;
+  will-change: transform;
+}
+
+/* ---------- The File ---------- */
+.file{
+  position:relative;
+  width: calc(var(--page-w) + 2 * var(--fpad));
+  height: calc(var(--page-h) + 2 * var(--fpad));
+  transform-style: preserve-3d;
+  font-size:16px;
+}
+@media (max-width:760px){ .file{ font-size:15px; } }
+
+/* back cover of the folder */
+.file-back{
+  position:absolute; inset:0;
+  border-radius:3px 4px 7px 6px;
+  transform: translateZ(-7px);
+  background:
+    radial-gradient(80% 60% at 18% 8%, rgba(255,238,200,.14), transparent 62%),
+    radial-gradient(70% 55% at 88% 96%, rgba(0,0,0,.30), transparent 72%),
+    linear-gradient(158deg, var(--kraft-light) 0%, var(--kraft) 40%, var(--kraft-2) 72%, var(--kraft-dark) 100%);
+  box-shadow:
+    0 42px 80px rgba(0,0,0,.78),
+    0 10px 26px rgba(0,0,0,.6),
+    inset 0 0 0 1px rgba(255,235,190,.10);
+}
+.file-back::after{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  background-image:var(--grain);
+  opacity:.22; mix-blend-mode:multiply;
+}
+
+/* paper stack + sheets */
+.pages-area{
+  position:absolute; inset:var(--fpad);
+  transform-style: preserve-3d;
+}
+.stack{
+  position:absolute; inset:-2px -1px -3px -1px;
+  background:linear-gradient(180deg,#cfc5ae,#bdb39c);
+  border-radius:1px 1px 3px 3px;
+  transform: translateZ(-2px);
+  box-shadow:
+    0 2px 0 -1px #b6ac94,
+    0 5px 0 -2px #a99f87,
+    0 8px 0 -3px #9b9179,
+    0 26px 46px rgba(0,0,0,.62);
+}
+
+.paper-surface{
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(58% 38% at 10% 6%, rgba(140,110,60,.11), transparent 72%),
+    radial-gradient(52% 34% at 92% 94%, rgba(122,92,46,.13), transparent 72%),
+    radial-gradient(26% 20% at 74% 22%, rgba(150,120,70,.07), transparent 70%),
+    var(--grain);
+  background-blend-mode:multiply,multiply,multiply,normal;
+  background-size:auto,auto,auto,180px 180px;
+}
+
+.sheet{
+  position:absolute; inset:0;
+  border-radius:1px 2px 3px 2px;
+}
+.sheet.base{
+  overflow:hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.5),
+    inset 0 0 70px rgba(120,95,50,.10),
+    0 16px 36px rgba(0,0,0,.42);
+}
+.sheet.flip{
+  transform-origin: right center;
+  transform-style: preserve-3d;
+  opacity:0;
+  pointer-events:none;
+  will-change: transform, opacity;
+}
+.sheet.flip .face{
+  position:absolute; inset:0;
+  overflow:hidden;
+  border-radius:1px 2px 3px 2px;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.5),
+    inset 0 0 70px rgba(120,95,50,.10);
+}
+.sheet.flip .face.back{
+  transform: rotateY(180deg);
+  /* back of the sheet: plain aged paper */
+  background-color:#CFC5AE;
+  background-image:
+    radial-gradient(60% 40% at 80% 12%, rgba(120,95,50,.10), transparent 70%),
+    var(--grain);
+  background-blend-mode:multiply,normal;
+}
+/* moving shadow on the flipping sheet */
+.sheet.flip .face::after{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(90deg, rgba(0,0,0,.28), rgba(0,0,0,0) 55%);
+  opacity:.9;
+}
+
+/* ---------- Cover ---------- */
+.cover-pivot{
+  position:absolute; inset:0;
+  transform-origin: right center;
+  transform-style: preserve-3d;
+  pointer-events:none;
+  transition: transform 1.15s var(--ease-open), opacity .4s ease;
+  will-change: transform, opacity;
+}
+.file.open .cover-pivot{
+  transform: rotateY(-168deg);
+  opacity:0;
+  pointer-events:none;
+  transition: transform 1.15s var(--ease-open), opacity .38s ease .74s;
+}
+.cover{
+  position:absolute; inset:0;
+  transform-style: preserve-3d;
+  transform: translateZ(14px);
+}
+.cover-face{
+  position:absolute; inset:0;
+  border-radius:3px 4px 7px 6px;
+  overflow:hidden;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+.cover-front{
+  pointer-events:auto;
+  background:
+    radial-gradient(85% 60% at 18% 8%, rgba(255,240,205,.17), transparent 62%),
+    radial-gradient(65% 55% at 88% 94%, rgba(0,0,0,.30), transparent 72%),
+    linear-gradient(155deg, #B6A379 0%, #9C8A63 36%, #8B7A54 68%, #74653F 100%);
+  box-shadow:
+    0 34px 70px rgba(0,0,0,.78),
+    0 6px 18px rgba(0,0,0,.55),
+    inset 0 0 0 1px rgba(255,238,200,.13),
+    inset 0 0 100px rgba(0,0,0,.34);
+}
+.cover-inner{
+  transform: rotateY(180deg);
+  pointer-events:none;
+  background:
+    radial-gradient(80% 60% at 78% 10%, rgba(255,240,205,.14), transparent 62%),
+    linear-gradient(200deg, #A89670, #8B7A54 70%, #6E5F3D);
+  box-shadow: inset 0 0 0 1px rgba(255,238,200,.10), inset 0 0 90px rgba(0,0,0,.4);
+}
+.cover-grain{
+  position:absolute; inset:0; pointer-events:none;
+  background-image:var(--grain);
+  background-size:180px 180px;
+  opacity:.26; mix-blend-mode:multiply;
+}
+.cover-scratches{
+  position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:
+    linear-gradient(102deg, transparent 22%, rgba(255,255,255,.07) 22.4%, transparent 22.9%),
+    linear-gradient(97deg, transparent 63%, rgba(0,0,0,.13) 63.3%, transparent 63.7%),
+    linear-gradient(88deg, transparent 44%, rgba(255,255,255,.05) 44.3%, transparent 44.8%);
+}
+.cover-tab{
+  position:absolute; top:-1px; left:9%;
+  padding:.42em .9em .34em;
+  background:linear-gradient(180deg,#C2B08A,#A4906A);
+  color:#3b3221;
+  font-family:'Courier Prime',monospace; font-weight:700;
+  font-size:.58em; letter-spacing:.24em;
+  border-radius:0 0 3px 3px;
+  box-shadow:0 3px 8px rgba(0,0,0,.4), inset 0 -1px 0 rgba(0,0,0,.2);
+  transform: translateZ(1px);
+}
+.clip{
+  position:absolute; top:7%; right:7%;
+  width:.55em; height:2.6em;
+  border:.14em solid #b9bcc2;
+  border-radius:.4em .4em .2em .2em;
+  border-bottom-color:transparent;
+  opacity:.55;
+  transform: rotate(9deg);
+  box-shadow:0 1px 2px rgba(0,0,0,.4), inset 0 0 0 .03em rgba(255,255,255,.3);
+}
+
+.cover-inner-pad{
+  position:absolute; inset:0;
+  pointer-events:none;
+  padding: clamp(18px, 6%, 40px) clamp(16px, 6%, 38px) clamp(16px, 5%, 32px);
+  display:flex; flex-direction:column;
+  color:#2B2618;
+}
+.cover-top{
+  display:flex; align-items:center; justify-content:space-between; gap:1em;
+  font-family:'Courier Prime',monospace;
+  font-size:.6em; letter-spacing:.22em; text-transform:uppercase;
+  color:#3E3423; opacity:.9;
+}
+.cover-top b{color:#241e12;}
+.cover-rule{
+  height:1px; margin:.85em 0 .2em;
+  background:repeating-linear-gradient(90deg, rgba(43,38,24,.42) 0 5px, transparent 5px 10px);
+}
+.cover-subject{
+  margin:.55em 0 .1em;
+  display:flex; flex-direction:column; gap:.35em;
+}
+.cover-subject .lbl{
+  font-family:'Courier Prime',monospace;
+  font-size:.56em; letter-spacing:.3em; text-transform:uppercase;
+  color:#4A3F28; opacity:.85;
+}
+.cover-subject .val{
+  font-family:'Amiri',serif; font-weight:700;
+  font-size:2.15em; line-height:1.1;
+  color:#1C1810;
+  text-shadow:0 1px 0 rgba(255,240,205,.22);
+  word-break:break-word;
+}
+.cover-meta{
+  display:flex; flex-wrap:wrap; gap:.6em 1.6em;
+  margin-top:.7em;
+  font-family:'Courier Prime',monospace;
+  font-size:.6em; letter-spacing:.2em; text-transform:uppercase;
+}
+.cover-meta > div{display:flex; flex-direction:column; gap:.35em;}
+.cover-meta span{color:#4A3F28; opacity:.78; font-size:.9em;}
+.cover-meta b{color:#221C10; font-size:1.05em; letter-spacing:.22em;}
+.cover-meta b.red{color:var(--red);}
+.cover-note{
+  margin-top:auto;
+  font-family:'Aref Ruqaa',serif;
+  font-size:1.12em; line-height:1.7;
+  color:#33291a;
+  max-width:88%;
+  padding-right:.6em;
+  border-right:2px solid rgba(43,38,24,.28);
+}
+.cover-stamp{
+  position:absolute; left:clamp(14px,5%,30px); bottom:clamp(72px,15%,110px);
+  font-family:'Courier Prime',monospace; font-weight:700;
+  font-size:.72em; letter-spacing:.28em;
+  color:var(--red);
+  border:2px solid var(--red);
+  padding:.34em .8em;
+  border-radius:2px;
+  transform: rotate(-11deg);
+  opacity:.72;
+  mix-blend-mode:multiply;
+  text-transform:uppercase;
+  pointer-events:none;
+}
+.open-btn{
+  position:relative;
+  z-index:2;
+  pointer-events:auto;
+  margin-top:.8em;
+  align-self:flex-start;
+  display:inline-flex; align-items:center; gap:.7em;
+  min-height:44px;
+  padding:.58em 1em;
+  background:transparent;
+  color:#17130c;
+  border:2px solid rgba(38,30,17,.82);
+  border-radius:2px;
+  font-family:'Cairo',sans-serif; font-weight:700;
+  font-size:.86em; letter-spacing:.04em;
+  cursor:pointer;
+  box-shadow:none;
+  transition: transform .25s var(--ease), border-color .25s, background .25s, box-shadow .25s;
+}
+.open-btn svg{width:1.05em;height:1.05em;stroke:currentColor;fill:none;stroke-width:1.6;transition:transform .3s var(--ease);}
+.open-btn:hover{
+  transform: translateY(-2px);
+  border-color:#24190d;
+  background:rgba(250,240,218,.12);
+  box-shadow:0 2px 5px rgba(34,26,15,.18);
+}
+.open-btn:hover svg{transform: translateX(-4px);}
+.open-btn:active{transform:translateY(0);}
+.open-btn:focus-visible{outline:2px solid var(--red); outline-offset:3px;}
+.cover-open-btn{
+  position:absolute;
+  z-index:30;
+  right:clamp(16px,6%,38px);
+  bottom:clamp(16px,5%,32px);
+  margin:0;
+}
+.file.open .cover-open-btn{
+  visibility:hidden;
+  pointer-events:none;
+}
+.cover-note{
+  margin-bottom:calc(clamp(16px,5%,32px) + 3.6em);
+}
+
+/* ---------- Page ---------- */
+.page{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  padding: clamp(16px,5.4%,34px) clamp(16px,6%,38px) clamp(14px,4.4%,28px);
+  color:var(--ink);
+  direction:rtl;
+}
+.page-head,.page-foot{
+  flex:0 0 auto;
+  display:flex; align-items:center; justify-content:space-between; gap:1em;
+  font-family:'Courier Prime',ui-monospace,monospace;
+  font-size:.58em; letter-spacing:.2em; text-transform:uppercase;
+  color:#8D8676;
+}
+.page-head{border-bottom:1px solid rgba(38,36,31,.16); padding-bottom:.6em;}
+.page-foot{border-top:1px solid rgba(38,36,31,.16); padding-top:.6em;}
+.page-head .head-class{color:var(--red); opacity:.8;}
+.page-body{
+  flex:1 1 auto; min-height:0;
+  overflow-y:auto; overflow-x:hidden;
+  padding: .95em .1em .7em;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(38,36,31,.28) transparent;
+}
+.page-body::-webkit-scrollbar{width:5px;}
+.page-body::-webkit-scrollbar-track{background:transparent;}
+.page-body::-webkit-scrollbar-thumb{background:rgba(38,36,31,.24); border-radius:4px;}
+
+/* typography */
+.page-title{
+  font-family:'Amiri',serif; font-weight:700;
+  font-size:1.85em; line-height:1.28;
+  margin:0 0 .2em; color:#1F1D18;
+}
+.page-title.center{text-align:center;}
+.page-sub{
+  font-family:'Courier Prime',monospace;
+  font-size:.58em; letter-spacing:.22em; text-transform:uppercase;
+  color:#8D8676;
+  display:flex; align-items:center; gap:.7em; flex-wrap:wrap;
+}
+.page-sub .sep{opacity:.5;}
+.body-text{
+  font-size:.93em; line-height:1.98; color:#33302A;
+  margin:0 0 .85em; text-align:justify;
+}
+.body-text:last-child{margin-bottom:0;}
+.type-label{
+  font-family:'Courier Prime',monospace;
+  font-size:.56em; letter-spacing:.28em; text-transform:uppercase;
+  color:#8D8676; margin-bottom:.6em;
+  display:flex; align-items:center; gap:.7em;
+}
+.type-label::after{content:''; flex:1; height:1px; background:rgba(38,36,31,.16);}
+.hand{font-family:'Aref Ruqaa',serif; color:#2A3550; line-height:1.85;}
+.ink-red{color:var(--red);}
+.small-caps{font-family:'Courier Prime',monospace; font-size:.6em; letter-spacing:.2em; text-transform:uppercase; color:#8D8676;}
+
+/* placeholder for editable content */
+.ph{
+  color:#9C5748;
+  background:rgba(181,31,45,.065);
+  border-bottom:1px dashed rgba(181,31,45,.5);
+  padding:0 .22em;
+  border-radius:2px;
+}
+
+/* ---------- image boxes ---------- */
+.img-box{
+  position:relative; width:100%;
+  aspect-ratio:4/3;
+  overflow:hidden;
+  background:#2C2A25;
+  border:1px solid rgba(38,36,31,.25);
+}
+.img-box.ar-3-2{aspect-ratio:3/2;}
+.img-box.ar-1-1{aspect-ratio:1/1;}
+.img-box.ar-4-5{aspect-ratio:4/5;}
+.img-box.ar-16-9{aspect-ratio:16/9;}
+.img-box img{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; display:block;
+  filter:sepia(.16) contrast(1.03) saturate(.92) brightness(.98);
+}
+.img-ph{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:.5em; text-align:center; padding:1em;
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.028) 0 7px, transparent 7px 14px),
+    linear-gradient(160deg,#33302A,#25231E);
+  color:#7B7568;
+  font-family:'Courier Prime',monospace;
+  font-size:.58em; letter-spacing:.2em; line-height:1.7;
+}
+.img-ph small{
+  font-family:'Cairo',sans-serif; font-size:1.05em;
+  letter-spacing:0; color:#6A6457;
+}
+.img-ph::before{
+  content:''; position:absolute; inset:8%;
+  border:1px dashed rgba(216,206,184,.16);
+  border-radius:2px;
+}
+
+/* ---------- photo frame ---------- */
+.photo-frame{
+  position:relative;
+  background:linear-gradient(180deg,#F3ECDA,#E6DCC5);
+  padding:.5em .5em 1.9em;
+  border:1px solid rgba(38,36,31,.14);
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.34),
+    0 2px 4px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.7);
+}
+.photo-frame .cap{
+  position:absolute; left:.7em; right:.7em; bottom:.35em;
+  font-size:.68em; line-height:1.5; text-align:center;
+  color:#2A3550; opacity:.92;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.tilt-a{transform:rotate(-1.4deg);}
+.tilt-b{transform:rotate(1.7deg);}
+.tilt-c{transform:rotate(-.7deg);}
+
+.tape{
+  position:absolute;
+  width:4.6em; height:1.35em;
+  background:linear-gradient(180deg, rgba(236,227,208,.78), rgba(214,203,180,.62));
+  border-left:1px dashed rgba(0,0,0,.07);
+  border-right:1px dashed rgba(0,0,0,.07);
+  box-shadow:0 2px 5px rgba(0,0,0,.2);
+  opacity:.92;
+  pointer-events:none;
+}
+.tape-top{top:-.7em; left:50%; transform:translateX(-50%) rotate(-2deg);}
+.tape-tl{top:-.7em; right:-1em; transform:rotate(-32deg);}
+.tape-br{bottom:-.6em; left:-1em; transform:rotate(-28deg);}
+
+/* ---------- stamp ---------- */
+.stamp{
+  display:inline-block;
+  font-family:'Courier Prime',monospace; font-weight:700;
+  font-size:.62em; letter-spacing:.26em; text-transform:uppercase;
+  color:var(--red);
+  border:2px solid var(--red);
+  padding:.34em .8em;
+  border-radius:2px;
+  transform:rotate(-8deg);
+  opacity:.74;
+  mix-blend-mode:multiply;
+  pointer-events:none;
+}
+
+/* ---------- annotations ---------- */
+.underline{
+  position:relative; display:inline-block;
+}
+.underline::after{
+  content:''; position:absolute; left:-2px; right:-2px; bottom:-.22em;
+  height:2px;
+  background:linear-gradient(90deg, rgba(181,31,45,.75), rgba(181,31,45,.35));
+  border-radius:2px;
+  transform:rotate(-.4deg);
+}
+.circle-note{
+  position:relative; display:inline-block; padding:0 .25em;
+}
+.circle-note::before{
+  content:''; position:absolute; inset:-.35em -.3em -.25em -.3em;
+  border:2px solid rgba(181,31,45,.55);
+  border-radius:50% 46% 52% 48%;
+  transform:rotate(-3deg);
+  pointer-events:none;
+}
+.pencil{
+  font-family:'Aref Ruqaa',serif;
+  color:#5A5548;
+  font-size:.8em;
+  line-height:1.7;
+  opacity:.95;
+}
+.margin-note{
+  position:relative;
+  margin-top:.9em;
+  padding-right:1.1em;
+  border-right:2px solid rgba(181,31,45,.42);
+  font-family:'Aref Ruqaa',serif;
+  font-size:.86em; line-height:1.9;
+  color:#2A3550;
+}
+
+/* ============================================================
+   PAGE TEMPLATES
+   ============================================================ */
+
+/* ---- 01 INTRO ---- */
+.intro-layout{display:flex; gap:1.1em; align-items:flex-start; margin-top:.3em;}
+.intro-layout .photo-frame{flex:0 0 41%; max-width:41%;}
+.intro-copy{flex:1 1 auto; min-width:0;}
+.hand-note{
+  margin-top:1em; padding-top:.8em;
+  border-top:1px dashed rgba(38,36,31,.24);
+  font-size:.9em;
+}
+@media (max-width:760px){
+  .intro-layout{flex-direction:column;}
+  .intro-layout .photo-frame{flex:1 1 auto; max-width:78%; align-self:flex-start;}
+}
+
+/* ---- 02 PHOTO ---- */
+.tpl-photo{display:flex; flex-direction:column; align-items:center; text-align:center;}
+.tpl-photo .photo-frame{width:86%; margin:.9em 0 1em;}
+.tpl-photo .body-text{text-align:right;}
+.tpl-photo .photo-frame .cap{position:static; display:block; margin-top:.55em; white-space:normal;}
+
+/* ---- 03 MEMORY ---- */
+.memory-grid{
+  display:flex; gap:1.2em; align-items:flex-start; margin-top:.4em;
+}
+.memory-grid .photo-frame{flex:0 0 46%; max-width:46%;}
+.memory-copy{flex:1 1 auto; min-width:0;}
+.memory-copy .body-text{font-size:.9em;}
+@media (max-width:760px){
+  .memory-grid{flex-direction:column;}
+  .memory-grid .photo-frame{flex:1 1 auto; max-width:70%; align-self:flex-start;}
+}
+
+/* ---- 04 LETTER ---- */
+.letter-sheet{
+  border:1px solid rgba(38,36,31,.16);
+  background:
+    radial-gradient(70% 50% at 88% 6%, rgba(150,120,70,.09), transparent 70%),
+    linear-gradient(180deg,#EFE7D4,#E2D8C0);
+  padding:1.5em 1.4em 1.3em;
+  box-shadow:inset 0 0 46px rgba(120,95,50,.11);
+  position:relative;
+  min-height:100%;
+  display:flex; flex-direction:column;
+}
+.letter-sheet::before{
+  content:''; position:absolute; inset:6px;
+  border:1px dashed rgba(38,36,31,.14);
+  pointer-events:none;
+}
+.letter-salutation{
+  font-family:'Aref Ruqaa',serif;
+  font-size:1.22em; line-height:1.8;
+  color:#26304A; margin:0 0 .5em;
+}
+.letter-body p{
+  font-family:'Aref Ruqaa',serif;
+  font-size:1em; line-height:2.3;
+  color:#2C3550; margin:0 0 .85em;
+}
+.letter-sign{
+  margin-top:auto; padding-top:1.4em;
+  display:flex; align-items:flex-end; justify-content:space-between; gap:1em;
+}
+.letter-sign .sig{
+  font-family:'Aref Ruqaa',serif;
+  font-size:1.3em; color:#26304A;
+  border-bottom:1px solid rgba(38,36,31,.3);
+  padding-bottom:.15em;
+}
+.letter-sign .dt{
+  font-family:'Courier Prime',monospace;
+  font-size:.58em; letter-spacing:.2em; color:#8D8676; text-transform:uppercase;
+}
+
+/* ---- 05 EVIDENCE ---- */
+.evidence-head{
+  display:flex; align-items:center; justify-content:space-between; gap:1em;
+  margin-bottom:.9em;
+  padding:.5em .7em;
+  background:rgba(38,36,31,.055);
+  border:1px solid rgba(38,36,31,.16);
+  font-family:'Courier Prime',monospace;
+  font-size:.58em; letter-spacing:.2em; text-transform:uppercase;
+  color:#5F5A4E;
+}
+.evidence-photo{position:relative; margin:0 auto 1em; width:82%;}
+.evidence-photo .photo-frame{padding:.55em .55em 1.9em;}
+.evidence-marks{
+  position:absolute; inset:0; pointer-events:none;
+}
+.evidence-marks .mark{
+  position:absolute;
+  width:3.6em; height:2.4em;
+  border:2px solid rgba(181,31,45,.6);
+  border-radius:52% 46% 50% 48%;
+  transform:rotate(-5deg);
+  opacity:.75;
+}
+.evidence-marks .mark.b{
+  left:.6em; bottom:1.6em; transform:rotate(7deg) scale(.8);
+  border-color:rgba(101,181,140,.6);
+}
+.evidence-caption{
+  font-family:'Aref Ruqaa',serif;
+  font-size:.92em; line-height:1.9; color:#2A3550;
+  margin-bottom:.9em;
+}
+.evidence-stamp-row{display:flex; justify-content:flex-start; margin-top:.6em;}
+
+/* ---- 06 DETAILS COLLAGE ---- */
+.detail-grid{
+  display:flex; flex-wrap:wrap; gap:.6em;
+  align-content:flex-start;
+  margin-top:.2em;
+}
+.chip{
+  background:linear-gradient(180deg,#EFE7D3,#E1D7BE);
+  border:1px solid rgba(38,36,31,.16);
+  padding:.55em .8em .5em;
+  box-shadow:2px 3px 0 rgba(0,0,0,.09), 0 1px 3px rgba(0,0,0,.14);
+  max-width:100%;
+  transform:rotate(-1.1deg);
+}
+.chip:nth-child(even){transform:rotate(1.3deg);}
+.chip:nth-child(3n){transform:rotate(-.4deg);}
+.chip .k{
+  display:block;
+  font-family:'Courier Prime',monospace;
+  font-size:.52em; letter-spacing:.24em; text-transform:uppercase;
+  color:#8D8676; margin-bottom:.35em;
+}
+.chip .v{
+  font-size:.86em; line-height:1.7; color:#2E2B24;
+}
+.chip.wide{flex:1 1 100%;}
+.detail-note{
+  margin-top:1em;
+  font-family:'Aref Ruqaa',serif;
+  font-size:.88em; color:#2A3550; line-height:1.9;
+}
+.detail-photo{
+  width:38%; min-width:110px;
+  transform:rotate(2deg);
+}
+
+/* ---- 07 REDACTED ---- */
+.redact{
+  position:relative;
+  display:inline;
+  cursor:pointer;
+  padding:0 .14em;
+  border-radius:2px;
+  transition:background .4s ease;
+  outline:none;
+}
+.redact .rbar{
+  position:absolute; inset:-.04em -.12em;
+  background:linear-gradient(180deg,#1E1E20,#141416);
+  border-radius:1px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.4);
+  transition:opacity .45s ease, transform .45s ease;
+}
+.redact:hover .rbar{opacity:.82;}
+.redact:focus-visible{box-shadow:0 0 0 2px rgba(181,31,45,.6);}
+.redact.revealed{background:rgba(101,181,140,.14);}
+.redact.revealed .rbar{opacity:0; transform:scaleX(.9);}
+.redacted-hint{
+  font-family:'Courier Prime',monospace;
+  font-size:.56em; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--red); opacity:.85;
+  display:flex; align-items:center; gap:.7em;
+  margin-bottom:1em;
+}
+.redacted-hint::after{content:''; flex:1; height:1px; background:rgba(181,31,45,.25);}
+.redacted-body p{
+  font-size:.95em; line-height:2.25; color:#33302A;
+  margin:0 0 1em;
+}
+.redact-final{
+  margin-top:1.2em;
+  padding:1em 1.1em;
+  background:rgba(101,181,140,.09);
+  border-right:3px solid var(--green);
+  font-family:'Aref Ruqaa',serif;
+  font-size:.95em; line-height:1.95; color:#2A3550;
+  opacity:0; max-height:0; overflow:hidden; padding-top:0; padding-bottom:0;
+  transition:opacity .6s ease, max-height .6s ease, padding .6s ease;
+}
+.redact-final.show{opacity:1; max-height:16em; padding-top:1em; padding-bottom:1em;}
+
+/* ---- 08 SEQUENCE ---- */
+.seq-stack{display:flex; flex-direction:column; gap:1.1em; align-items:center;}
+.seq-item{position:relative;}
+.seq-item .photo-frame{width:100%;}
+.seq-item .cap-inline{
+  margin-top:.5em;
+  font-family:'Aref Ruqaa',serif;
+  font-size:.8em; color:#2A3550; text-align:center;
+}
+.seq-lg{width:88%;}
+.seq-md{width:64%; align-self:flex-start;}
+.seq-sm{width:52%; align-self:flex-end;}
+
+/* ---- 09 UNFINISHED ---- */
+.unfinished{
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:1.1em;
+  min-height:100%;
+  text-align:center;
+  padding:1em 0;
+}
+.unfinished .quote{
+  font-family:'Aref Ruqaa',serif;
+  font-size:1.12em; line-height:2.2; color:#2C3550;
+  max-width:88%;
+}
+.unfinished .rule{
+  width:36%; height:1px; background:rgba(38,36,31,.2);
+}
+.unfinished .photo-frame{width:56%;}
+
+/* ---- FINAL ---- */
+.final-wrap{
+  display:flex; flex-direction:column;
+  min-height:100%;
+  gap:1.1em;
+}
+.final-title{
+  font-family:'Amiri',serif; font-weight:700;
+  font-size:1.6em; line-height:1.35; color:#1F1D18;
+  text-align:center; margin:0;
+}
+.final-photo{width:58%; align-self:center;}
+.final-message{
+  font-family:'Aref Ruqaa',serif;
+  font-size:1.02em; line-height:2.25;
+  color:#2A3550;
+  padding:1.1em 1.2em;
+  border:1px solid rgba(38,36,31,.16);
+  background:
+    radial-gradient(70% 50% at 85% 8%, rgba(150,120,70,.09), transparent 70%),
+    linear-gradient(180deg,#EFE7D4,#E3D9C1);
+  box-shadow:inset 0 0 40px rgba(120,95,50,.1);
+  position:relative;
+}
+.final-message::before{
+  content:''; position:absolute; inset:6px;
+  border:1px dashed rgba(38,36,31,.13);
+  pointer-events:none;
+}
+.final-sign{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:1em;
+  margin-top:auto;
+}
+.final-sign .sig{
+  font-family:'Aref Ruqaa',serif; font-size:1.25em; color:#26304A;
+  border-bottom:1px solid rgba(38,36,31,.3); padding-bottom:.12em;
+}
+.final-sign .dt{
+  font-family:'Courier Prime',monospace; font-size:.56em;
+  letter-spacing:.2em; text-transform:uppercase; color:#8D8676;
+}
+.close-btn{
+  align-self:center;
+  margin-top:.4em;
+  padding:.72em 1.5em;
+  background:transparent;
+  border:1px solid rgba(181,31,45,.55);
+  color:var(--red);
+  font-family:'Courier Prime',monospace;
+  font-size:.68em; letter-spacing:.24em; text-transform:uppercase;
+  border-radius:2px; cursor:pointer;
+  transition:.28s ease;
+}
+.close-btn:hover{
+  background:rgba(181,31,45,.09);
+  border-color:var(--red);
+  letter-spacing:.3em;
+}
+.close-btn:focus-visible{outline:2px solid var(--red); outline-offset:3px;}
+
+/* ---------- Page navigation, printed into the paper ---------- */
+.page-foot{gap:.5em; padding-top:.55em; font-size:.9em;}
+.nav-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:.5em;
+  background:rgba(98,78,49,.08);
+  border:1px solid rgba(68,57,39,.24);
+  color:#514832;
+  font-family:'Courier Prime',monospace;
+  min-width:4.6em; min-height:4.6em;
+  font-size:.78em; letter-spacing:.08em;
+  padding:.3em .45em; border-radius:2px; cursor:pointer;
+  transition:.25s ease; white-space:nowrap;
+  flex:0 0 auto;
+}
+.nav-btn svg{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.nav-btn:hover:not(:disabled){border-color:rgba(181,31,45,.55); color:var(--red); background:rgba(181,31,45,.05);}
+.nav-btn:focus-visible{outline:1px solid var(--red); outline-offset:2px;}
+.nav-btn:disabled{opacity:.25; cursor:default;}
+.page-count{
+  flex:1 1 auto; min-width:2em;
+  display:flex; align-items:center; justify-content:center;
+}
+.counter{
+  font-family:'Courier Prime',monospace;
+  font-size:.7em; letter-spacing:.12em; color:#625b4c;
+  display:flex; align-items:center; gap:.55em;
+}
+.counter i{color:#9a8f78; font-style:normal;}
+@media (max-width:520px){
+  .nav-btn{padding:.4em .5em; gap:.28em;}
+  .nav-btn svg{display:none;}
+  .counter{font-size:.64em;}
+}
+
+/* ---------- Reveal animation for pages ---------- */
+@keyframes pageIn{
+  from{opacity:0; transform:translateY(6px);}
+  to{opacity:1; transform:none;}
+}
+.page-body > *{animation:pageIn .55s var(--ease) both;}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+  .cover-pivot{transition:none !important;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="desk" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="scanlines" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="dot" aria-hidden="true"></span>
+    <b>THE PRIVATE FILE</b>
+    <span class="sep">//</span>
+    <span class="sub">PERSONAL DOSSIER — RESTRICTED ACCESS</span>
+  </div>
+  <div class="tools">
+    <button class="tool" id="closeTopBtn" type="button" hidden>إغلاق الملف</button>
+    <button class="tool" id="soundBtn" type="button" aria-pressed="true">SOUND: ON</button>
+  </div>
+</header>
+
+<main class="stage" id="stage">
+  <div class="scaler" id="scaler">
+    <div class="file" id="file">
+
+      <!-- back of the folder -->
+      <div class="file-back" aria-hidden="true"></div>
+
+      <!-- pages -->
+      <div class="pages-area" id="pagesArea">
+        <div class="stack" aria-hidden="true"></div>
+        <div class="sheet base paper-surface" id="sheetBase" aria-live="polite"></div>
+        <div class="sheet flip" id="sheetFlip" style="opacity:0" aria-hidden="true">
+          <div class="face front paper-surface" id="flipFront"></div>
+          <div class="face back"></div>
+        </div>
+      </div>
+
+      <!-- cover -->
+      <div class="cover-pivot" id="coverPivot">
+        <div class="cover">
+          <div class="cover-face cover-front">
+            <div class="cover-grain" aria-hidden="true"></div>
+            <div class="cover-scratches" aria-hidden="true"></div>
+            <div class="clip" aria-hidden="true"></div>
+            <div class="cover-tab" id="coverTab">FILE 001</div>
+
+            <div class="cover-inner-pad">
+              <div class="cover-top">
+                <span>PERSONAL DOSSIER</span>
+                <span>FILE NO. <b id="coverFileNo">001</b></span>
+              </div>
+              <div class="cover-rule" aria-hidden="true"></div>
+
+              <h1 class="cover-subject">
+                <span class="lbl">SUBJECT</span>
+                <span class="val" id="coverSubject">اسم الشخص</span>
+              </h1>
+
+              <div class="cover-meta">
+                <div>
+                  <span>CLASSIFICATION</span>
+                  <b class="red" id="coverClass">PRIVATE</b>
+                </div>
+                <div>
+                  <span>STATUS</span>
+                  <b id="coverStatus">SEALED</b>
+                </div>
+              </div>
+
+              <div class="cover-note" id="coverNote">الملف ده مش معمول لأي حد.</div>
+            </div>
+
+            <div class="cover-stamp" aria-hidden="true">PRIVATE</div>
+          </div>
+
+          <div class="cover-face cover-inner">
+            <div class="cover-grain" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="open-btn cover-open-btn" id="openBtn" type="button">
+        <span>افتح الملف</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   1. CONTENT CONFIGURATION — عدّل كل حاجة من هنا
+   ============================================================
+   اكتب النصوص العادية عادي.
+   أي حاجة بين {{ }} هتظهر كخانة فاضية محتاجة تتكتب.
+   في صفحة "المحجوبة" استخدم <r>النص السري</r> عشان تحجبه.
+   ============================================================ */
+
+const DOSSIER = {
+  fileNumber: "001",
+  subject: "يوسف",
+  classification: "PRIVATE",
+  status: "SEALED",
+  coverNote: "يا يوسف، عملتلك الملف ده عشان نفتكر سوا أحلى حكاياتنا.",
+
+  /* ---- الصفحات ---- */
+  pages: [
+
+    /* PAGE 01 — أول تسجيل */
+    {
+      type: "intro",
+      title: "من أول يوم وإنت صاحبي",
+      ref: "REF-001-A",
+      date: "10/10/2003",
+      image: "assets/memory-01.svg",
+      caption: "أول صفحة في حكايتنا",
+      memory: "يا يوسف، يمكن كل واحد فينا فاكر بداية صداقتنا بشكل مختلف، بس اللي أنا متأكد منه إنك بقيت من أقرب الناس ليا من غير ما أحس. من أول كلامنا والهزار اللي ملوش آخر، وأنا عارف إن الأيام معاك دايمًا ليها طعم تاني.",
+      note: "دي مفاجأة صغيرة من صاحبك اللي بيقدّرك."
+    },
+
+    /* PAGE 02 — الصورة */
+    {
+      type: "photo",
+      title: "ضحكنا من قلبنا",
+      date: "10/10/2003",
+      image: "assets/memory-02.svg",
+      caption: "كل قعدة معاك ليها حكاية",
+      memory: "فاكر القعدات اللي بنقول فيها: «هنقعد شوية ونمشي» وبنلاقي الوقت عدى؟ الكلام يبدأ في أي حاجة، وبعدها نقلبها هزار وضحك. يمكن كانت أيام عادية، بس وجودك هو اللي كان بيخلّيها مميزة."
+    },
+
+    /* PAGE 03 — الذكرى */
+    {
+      type: "memory",
+      title: "حاجات بتفكرني بيك",
+      ref: "REF-003-C",
+      date: "10/10/2003",
+      image: "assets/memory-03.svg",
+      caption: "من دفتر الذكريات اللي بينا",
+      paragraphs: [
+        "فاكر هزارنا اللي محدش غيرنا بيفهمه؟ أول ما واحد فينا يقول كلمة، التاني يضحك قبل ما الباقيين يعرفوا إيه الحكاية. دي من الحاجات اللي بحبها في صحبتنا.",
+        "وفاكر كمان إنك دايمًا بتعرف تهوّن اليوم بكلمتين، حتى لو أنا مش عارف أشرح مالي. يمكن ما بقولهاش كتير، بس أنا مقدّر ده جدًا."
+      ],
+      underline: "أحلى حاجة في الذكرى إننا عشناها سوا.",
+      note: "وكل مرة نفتكرها، نضحك كأنها حصلت امبارح."
+    },
+
+    /* PAGE 04 — الورقة الخاصة */
+    {
+      type: "letter",
+      title: "ورقة خاصة",
+      salutation: "يا يوسف يا صاحبي،",
+      body: [
+        "عملتلك الملف ده عشان أقولك إن كل خروجة، وكل مكالمة طويلة، وكل مرة ضحكنا فيها على حاجة سخيفة لسه فاكرهم ومبسوط إنهم حصلوا معاك.",
+        "إنت مش مجرد صاحب بنقضي معاه وقت؛ إنت أخ وسند، ووجودك فارق معايا بجد. يا رب تفضل الضحكة واللمة بينا، ونفضل نزوّد على الملف ده ذكريات أحلى."
+      ],
+      signature: "صاحبك اللي بيحبك",
+      date: "10/10/2003"
+    },
+
+    /* PAGE 05 — الدليل */
+    {
+      type: "evidence",
+      title: "الدليل إنك صاحب جدع",
+      evidenceId: "EV-005",
+      date: "10/10/2003",
+      image: "assets/memory-01.svg",
+      caption: "صورة رمزية لذكرى حلوة",
+      note: "الدليل الأول: وقت ما أحتاجك بلاقيك. والدليل التاني: إن أي يوم معاك بيبقى أحسن.",
+      stamp: "صاحب جدع"
+    },
+
+    /* PAGE 06 — تفاصيل فاكرينها */
+    {
+      type: "details",
+      title: "تفاصيلنا اللي بنحبها",
+      lead: "حاجات بسيطة، بس كل واحدة فيهم بتفكرني بصاحبي يوسف.",
+      image: "assets/memory-02.svg",
+      imageCaption: "كل تفصيلة وراها حكاية",
+      items: [
+        { tag: "جملتنا المعتادة",  text: "طب يلا، ونشوف هنوصل لفين" },
+        { tag: "أحلى مكان",    text: "أي حتة فيها قعدة وضحك معاك" },
+        { tag: "تاريخ الملف",          text: "10/10/2003" },
+        { tag: "الهزار الخاص",  text: "إفيه قديم ولسه بنضحك عليه" },
+        { tag: "أحلى عادة",   text: "نطمن على بعض حتى وسط الزحمة" }
+      ],
+      note: "التفاصيل دي مش كل الحكاية؛ دي بس شوية من اللي فاكره."
+    },
+
+    /* PAGE 07 — حكاية ظاهرة */
+    {
+      type: "memory",
+      title: "وقت ما كنت محتاج صاحب",
+      ref: "من ذكرياتنا",
+      date: "10/10/2003",
+      image: "assets/memory-03.svg",
+      caption: "دايمًا في ضهر بعض",
+      paragraphs: [
+        "في أيام بتبقى تقيلة، وساعتها وجود صاحب يسمعك من غير ما يحكم عليك بيفرق كتير. عمري ما بنسى إنك كنت بتسأل عليّا وبتحاول تخليني أضحك، حتى لو بكلمتين.",
+        "وأنا كمان عايزك تعرف إني موجود لك في أي وقت. الصحاب مش بس خروجات وضحك؛ الصحاب ضهر لبعض وقت الجد كمان."
+      ],
+      underline: "إحنا صحاب في الحلوة والمرة.",
+      note: "دي من أكتر الحاجات اللي بعتز بيها فيك."
+    },
+
+    /* PAGE 08 — سلسلة الصور */
+    {
+      type: "sequence",
+      title: "ألبوم صغير لذكرياتنا",
+      shots: [
+        { image: "assets/memory-01.svg", caption: "من هنا بدأت الحكاية", size: "lg", tilt: "tilt-a" },
+        { image: "assets/memory-02.svg", caption: "قعدة وضحكة ملهاش آخر", size: "md", tilt: "tilt-b" },
+        { image: "assets/memory-03.svg", caption: "صحاب وسند على طول", size: "sm", tilt: "tilt-c" }
+      ]
+    },
+
+    /* PAGE 09 — الورقة اللي لسه ما خلصتش */
+    {
+      type: "unfinished",
+      title: "لسه في ذكريات جاية",
+      quote: "اللي فات كان حلو عشان كنا سوا، واللي جاي أحلى بإذن الله.",
+      image: "assets/memory-03.svg",
+      caption: "مستنيين الصورة اللي جاية",
+      closing: "جهّز نفسك لخروجة جديدة قريب!"
+    },
+
+    /* FINAL PAGE — آخر صفحة */
+    {
+      type: "final",
+      title: "مفاجأة من صاحبك",
+      image: "assets/memory-01.svg",
+      caption: "أحلى الذكريات لسه قدامنا",
+      message: "يا يوسف، لو وصلت لآخر صفحة فالمفاجأة نجحت! عملتلك الملف ده عشان أقولك إنك غالي عندي، وإن كل ذكرى بينا ليها مكان عندي. شكرًا إنك صاحبي وأخويا. يلا بقى، مستنيين نعمل ذكريات جديدة ونضيفها هنا!",
+      signature: "صاحبك وأخوك",
+      date: "10/10/2003",
+      closeLabel: "إغلاق الملف"
+    }
+  ]
+};
+
+/* ============================================================
+   2. HELPERS
+   ============================================================ */
+
+function fmt(s){
+  if(s === undefined || s === null) return '';
+  return String(s).replace(/\{\{([\s\S]*?)\}\}/g, function(m, inner){
+    return '<span class="ph">' + inner.trim() + '</span>';
+  });
+}
+
+function parseRedactions(str){
+  if(!str) return '';
+  return String(str).replace(/<r>([\s\S]*?)<\/r>/g, function(m, inner){
+    return '<span class="redact" tabindex="0" role="button" aria-label="نص محجوب — اضغط للكشف">' +
+             '<span class="redact-text">' + inner + '</span>' +
+             '<span class="rbar" aria-hidden="true"></span>' +
+           '</span>';
+  });
+}
+
+function imgBox(src, alt, ratioClass){
+  const r = ratioClass ? ' ' + ratioClass : '';
+  const img = (src && String(src).trim())
+    ? '<img src="' + src + '" alt="' + (alt || '').replace(/"/g,'&quot;') + '" loading="lazy" onerror="this.style.display=\'none\'">'
+    : '';
+  return '<div class="img-box' + r + '">' +
+           (img ? '' : '<div class="img-ph" aria-hidden="true"><span>IMAGE TO BE SUPPLIED</span><small>استبدل الصورة</small></div>') +
+           img +
+         '</div>';
+}
+
+/* ============================================================
+   3. PAGE TEMPLATES
+   ============================================================ */
+
+const T = {};
+
+/* ---- 01 INTRO ---- */
+T.intro = function(p){
+  return '' +
+  '<div class="type-label">SUBJECT NOTE</div>' +
+  '<h2 class="page-title">' + fmt(p.title) + '</h2>' +
+  '<div class="page-sub">' + (p.ref ? '<span>' + p.ref + '</span><span class="sep">·</span>' : '') +
+    '<span>' + fmt(p.date) + '</span></div>' +
+
+  '<div class="intro-layout">' +
+    '<figure class="photo-frame tilt-a">' +
+      '<span class="tape tape-top"></span>' +
+      imgBox(p.image, p.caption, 'ar-4-3') +
+      '<figcaption class="cap hand">' + fmt(p.caption) + '</figcaption>' +
+    '</figure>' +
+    '<div class="intro-copy">' +
+      '<p class="body-text">' + fmt(p.memory) + '</p>' +
+    '</div>' +
+  '</div>' +
+
+  '<div class="hand-note hand">' + fmt(p.note) + '</div>';
+};
+
+/* ---- 02 PHOTO ---- */
+T.photo = function(p){
+  return '' +
+  '<div class="type-label" style="justify-content:center">PHOTOGRAPHIC RECORD</div>' +
+  '<h2 class="page-title center">' + fmt(p.title) + '</h2>' +
+  '<div class="page-sub" style="justify-content:center">' + fmt(p.date) + '</div>' +
+
+  '<div class="tpl-photo">' +
+    '<figure class="photo-frame tilt-b">' +
+      '<span class="tape tape-tl"></span>' +
+      imgBox(p.image, p.caption, 'ar-3-2') +
+      '<figcaption class="cap hand">' + fmt(p.caption) + '</figcaption>' +
+    '</figure>' +
+    '<p class="body-text">' + fmt(p.memory) + '</p>' +
+  '</div>';
+};
+
+/* ---- 03 MEMORY ---- */
+T.memory = function(p){
+  const paras = (p.paragraphs || []).map(function(t){
+    return '<p class="body-text">' + fmt(t) + '</p>';
+  }).join('');
+
+  return '' +
+  '<div class="type-label">MEMORY LOG</div>' +
+  '<h2 class="page-title">' + fmt(p.title) + '</h2>' +
+  '<div class="page-sub">' + (p.ref ? '<span>' + p.ref + '</span><span class="sep">·</span>' : '') +
+    '<span>' + fmt(p.date) + '</span></div>' +
+
+  '<div class="memory-grid">' +
+    '<div class="memory-copy">' +
+      paras +
+      (p.underline ? '<p class="body-text"><span class="underline">' + fmt(p.underline) + '</span></p>' : '') +
+    '</div>' +
+    '<figure class="photo-frame tilt-c">' +
+      '<span class="tape tape-tl"></span>' +
+      imgBox(p.image, p.caption, 'ar-4-5') +
+      '<figcaption class="cap hand">' + fmt(p.caption) + '</figcaption>' +
+    '</figure>' +
+  '</div>' +
+
+  (p.note ? '<div class="margin-note">' + fmt(p.note) + '</div>' : '');
+};
+
+/* ---- 04 LETTER ---- */
+T.letter = function(p){
+  const body = (p.body || []).map(function(t){
+    return '<p>' + fmt(t) + '</p>';
+  }).join('');
+
+  return '' +
+  '<div class="letter-sheet">' +
+    '<div class="type-label">PRIVATE NOTE</div>' +
+    '<p class="letter-salutation">' + fmt(p.salutation) + '</p>' +
+    '<div class="letter-body">' + body + '</div>' +
+    '<div class="letter-sign">' +
+      '<span class="sig">' + fmt(p.signature) + '</span>' +
+      '<span class="dt">' + fmt(p.date) + '</span>' +
+    '</div>' +
+  '</div>';
+};
+
+/* ---- 05 EVIDENCE ---- */
+T.evidence = function(p){
+  return '' +
+  '<div class="evidence-head">' +
+    '<span>EVIDENCE SHEET</span>' +
+    '<span>ID: ' + (p.evidenceId || '—') + '</span>' +
+  '</div>' +
+
+  '<div class="evidence-photo">' +
+    '<figure class="photo-frame tilt-a">' +
+      '<span class="tape tape-top"></span>' +
+      imgBox(p.image, p.caption, 'ar-3-2') +
+      '<figcaption class="cap hand">' + fmt(p.caption) + '</figcaption>' +
+    '</figure>' +
+    '<div class="evidence-marks" aria-hidden="true">' +
+      '<span class="mark"></span>' +
+      '<span class="mark b"></span>' +
+    '</div>' +
+  '</div>' +
+
+  '<div class="evidence-caption">' + fmt(p.note) + '</div>' +
+
+  '<div class="evidence-stamp-row">' +
+    '<span class="stamp">' + (p.stamp || 'CONFIRMED') + '</span>' +
+  '</div>' +
+
+  '<div class="page-sub" style="margin-top:1em">' +
+    '<span>DATE</span><span class="sep">·</span><span>' + fmt(p.date) + '</span>' +
+  '</div>';
+};
+
+/* ---- 06 DETAILS ---- */
+T.details = function(p){
+  const chips = (p.items || []).map(function(it){
+    return '<div class="chip">' +
+      '<span class="k">' + fmt(it.tag) + '</span>' +
+      '<span class="v">' + fmt(it.text) + '</span>' +
+    '</div>';
+  }).join('');
+
+  return '' +
+  '<div class="type-label">COLLECTED DETAILS</div>' +
+  '<h2 class="page-title">' + fmt(p.title) + '</h2>' +
+  (p.lead ? '<p class="body-text">' + fmt(p.lead) + '</p>' : '') +
+
+  '<div class="detail-grid">' +
+    chips +
+    '<figure class="photo-frame detail-photo tilt-b">' +
+      '<span class="tape tape-top"></span>' +
+      imgBox(p.image, p.imageCaption, 'ar-1-1') +
+      '<figcaption class="cap hand">' + fmt(p.imageCaption) + '</figcaption>' +
+    '</figure>' +
+  '</div>' +
+
+  (p.note ? '<div class="detail-note">' + fmt(p.note) + '</div>' : '');
+};
+
+/* ---- 07 REDACTED ---- */
+T.redacted = function(p){
+  const paras = (p.paragraphs || []).map(function(t){
+    return '<p>' + fmt(parseRedactions(t)) + '</p>';
+  }).join('');
+
+  return '' +
+  '<div class="type-label">REDACTED SECTION</div>' +
+  '<h2 class="page-title">' + fmt(p.title) + '</h2>' +
+  '<div class="redacted-hint">' + fmt(p.hint) + '</div>' +
+
+  '<div class="redacted-body">' + paras + '</div>' +
+
+  '<div class="redact-final">' + fmt(p.revealed) + '</div>';
+};
+
+/* ---- 08 SEQUENCE ---- */
+T.sequence = function(p){
+  const shots = (p.shots || []).map(function(s){
+    const cls = s.size === 'lg' ? 'seq-lg' : (s.size === 'sm' ? 'seq-sm' : 'seq-md');
+    const ratio = s.size === 'lg' ? 'ar-3-2' : (s.size === 'sm' ? 'ar-4-5' : 'ar-4-3');
+    return '<figure class="seq-item ' + cls + ' photo-frame ' + (s.tilt || '') + '">' +
+      '<span class="tape tape-top"></span>' +
+      imgBox(s.image, s.caption, ratio) +
+      '<figcaption class="cap hand">' + fmt(s.caption) + '</figcaption>' +
+    '</figure>';
+  }).join('');
+
+  return '' +
+  '<div class="type-label">PHOTO SEQUENCE</div>' +
+  '<h2 class="page-title">' + fmt(p.title) + '</h2>' +
+  '<div class="seq-stack">' + shots + '</div>';
+};
+
+/* ---- 09 UNFINISHED ---- */
+T.unfinished = function(p){
+  return '' +
+  '<div class="unfinished">' +
+    '<div class="type-label" style="width:100%;justify-content:center">UNFINISHED NOTE</div>' +
+    '<h2 class="page-title" style="text-align:center">' + fmt(p.title) + '</h2>' +
+    '<div class="rule" aria-hidden="true"></div>' +
+    '<div class="quote">' + fmt(p.quote) + '</div>' +
+    '<figure class="photo-frame tilt-c">' +
+      '<span class="tape tape-top"></span>' +
+      imgBox(p.image, p.caption, 'ar-4-3') +
+      '<figcaption class="cap hand">' + fmt(p.caption) + '</figcaption>' +
+    '</figure>' +
+    '<div class="pencil">' + fmt(p.closing) + '</div>' +
+  '</div>';
+};
+
+/* ---- FINAL ---- */
+T.final = function(p){
+  return '' +
+  '<div class="final-wrap">' +
+    '<div class="type-label" style="justify-content:center">FINAL ENTRY</div>' +
+    '<h2 class="final-title">' + fmt(p.title) + '</h2>' +
+
+    '<figure class="photo-frame final-photo tilt-a">' +
+      '<span class="tape tape-top"></span>' +
+      imgBox(p.image, p.caption, 'ar-4-3') +
+      '<figcaption class="cap hand">' + fmt(p.caption) + '</figcaption>' +
+    '</figure>' +
+
+    '<div class="final-message">' + fmt(p.message) + '</div>' +
+
+    '<div class="final-sign">' +
+      '<span class="sig">' + fmt(p.signature) + '</span>' +
+      '<span class="dt">' + fmt(p.date) + '</span>' +
+    '</div>' +
+
+    '<button class="close-btn" type="button" data-action="close-file">' +
+      fmt(p.closeLabel || 'إغلاق الملف') +
+    '</button>' +
+  '</div>';
+};
+
+/* ============================================================
+   4. RENDER
+   ============================================================ */
+
+const file        = document.getElementById('file');
+const scaler      = document.getElementById('scaler');
+const stage       = document.getElementById('stage');
+const pagesArea   = document.getElementById('pagesArea');
+const sheetBase   = document.getElementById('sheetBase');
+const sheetFlip   = document.getElementById('sheetFlip');
+const flipFront   = document.getElementById('flipFront');
+const openBtn     = document.getElementById('openBtn');
+const soundBtn    = document.getElementById('soundBtn');
+const closeTopBtn = document.getElementById('closeTopBtn');
+
+const TOTAL = DOSSIER.pages.length;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let idx = 0;
+let isOpen = false;
+let flipping = false;
+
+function pageHTML(i){
+  const p = DOSSIER.pages[i];
+  if(!p) return '';
+  const fn = T[p.type] || T.intro;
+  return '<div class="page" data-type="' + p.type + '">' +
+    '<div class="page-head">' +
+      '<span>FILE NO. ' + DOSSIER.fileNumber + '</span>' +
+      '<span class="head-class">' + DOSSIER.classification + '</span>' +
+    '</div>' +
+    '<div class="page-body">' + fn(p, i) + '</div>' +
+    '<div class="page-foot">' +
+      '<button class="nav-btn" data-nav="next" type="button" aria-label="الصفحة التالية">' +
+        '<span>التالي</span>' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>' +
+      '</button>' +
+      '<div class="page-count">' +
+        '<div class="counter"><span>صفحة</span><span data-current-page>01</span><i>/</i><span data-total-pages>10</span></div>' +
+      '</div>' +
+      '<button class="nav-btn" data-nav="prev" type="button" aria-label="الصفحة السابقة">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>' +
+        '<span>السابق</span>' +
+      '</button>' +
+    '</div>' +
+  '</div>';
+}
+
+/* ============================================================
+   5. SCALE TO FIT
+   ============================================================ */
+
+function fit(){
+  const w = file.offsetWidth;
+  const h = file.offsetHeight;
+  if(!w || !h) return;
+  const availW = stage.clientWidth - 20;
+  const availH = stage.clientHeight - 20;
+  let s = Math.min(availW / w, availH / h);
+  s = Math.max(0.25, Math.min(s, 1.35));
+  scaler.style.setProperty('--s', s.toFixed(4));
+}
+
+window.addEventListener('resize', fit, { passive: true });
+window.addEventListener('orientationchange', function(){ setTimeout(fit, 220); });
+if(window.ResizeObserver){
+  new ResizeObserver(fit).observe(stage);
+}
+
+/* ============================================================
+   6. UI STATE
+   ============================================================ */
+
+function updateUI(){
+  const curPageEl = sheetBase.querySelector('[data-current-page]');
+  const totPageEl = sheetBase.querySelector('[data-total-pages]');
+  const prevBtn = sheetBase.querySelector('[data-nav="prev"]');
+  const nextBtn = sheetBase.querySelector('[data-nav="next"]');
+  curPageEl.textContent = String(idx + 1).padStart(2, '0');
+  totPageEl.textContent = String(TOTAL).padStart(2, '0');
+  prevBtn.disabled = (idx === 0);
+  nextBtn.disabled = (idx === TOTAL - 1);
+}
+
+/* ============================================================
+   7. OPEN / CLOSE
+   ============================================================ */
+
+function openFile(){
+  if(isOpen) return;
+  isOpen = true;
+  idx = 0;
+  sheetBase.innerHTML = pageHTML(0);
+  document.body.classList.add('is-open');
+  file.classList.add('open');
+  closeTopBtn.hidden = false;
+  updateUI();
+  sound('open');
+  setTimeout(fit, 60);
+}
+
+function closeFile(){
+  if(!isOpen) return;
+  isOpen = false;
+  document.body.classList.remove('is-open');
+  file.classList.remove('open');
+  closeTopBtn.hidden = true;
+  sound('close');
+  setTimeout(function(){
+    idx = 0;
+    sheetBase.innerHTML = pageHTML(0);
+    sheetFlip.style.transition = 'none';
+    sheetFlip.style.opacity = '0';
+    sheetFlip.style.transform = 'rotateY(0deg)';
+    updateUI();
+  }, 900);
+}
+
+openBtn.addEventListener('click', openFile);
+closeTopBtn.addEventListener('click', closeFile);
+
+/* ============================================================
+   8. PAGE TURNING
+   ============================================================ */
+
+function turn(target, dir){
+  if(flipping) return;
+  if(target < 0 || target >= TOTAL) return;
+
+  flipping = true;
+  sound(dir > 0 ? 'forward' : 'back');
+
+  if(reduceMotion){
+    idx = target;
+    sheetBase.innerHTML = pageHTML(idx);
+    updateUI();
+    flipping = false;
+    return;
+  }
+
+  if(dir > 0){
+    /* ---- FORWARD (RTL): the page's left edge swings right ---- */
+    flipFront.innerHTML = pageHTML(idx);
+    sheetBase.innerHTML = pageHTML(target);
+
+    sheetFlip.style.transition = 'none';
+    sheetFlip.style.opacity = '1';
+    sheetFlip.style.transform = 'rotateY(0deg)';
+    void sheetFlip.offsetWidth;
+
+    sheetFlip.style.transition = 'transform .74s cubic-bezier(.42,.02,.3,1), opacity .3s linear .5s';
+    sheetFlip.style.transform = 'rotateY(180deg)';
+    sheetFlip.style.opacity = '0';
+  } else {
+    /* ---- BACKWARD: the page comes back from the right ---- */
+    flipFront.innerHTML = pageHTML(target);
+    sheetBase.innerHTML = pageHTML(idx);
+
+    sheetFlip.style.transition = 'none';
+    sheetFlip.style.opacity = '0';
+    sheetFlip.style.transform = 'rotateY(180deg)';
+    void sheetFlip.offsetWidth;
+
+    sheetFlip.style.transition = 'transform .74s cubic-bezier(.42,.02,.3,1), opacity .22s linear .06s';
+    sheetFlip.style.transform = 'rotateY(0deg)';
+    sheetFlip.style.opacity = '1';
+  }
+
+  window.setTimeout(function(){
+    idx = target;
+    sheetBase.innerHTML = pageHTML(idx);
+
+    sheetFlip.style.transition = 'none';
+    sheetFlip.style.transform = 'rotateY(0deg)';
+    sheetFlip.style.opacity = '0';
+    flipFront.innerHTML = '';
+
+    flipping = false;
+    updateUI();
+  }, 760);
+}
+
+function goNext(){
+  if(!isOpen || flipping) return;
+  if(idx >= TOTAL - 1) return;
+  turn(idx + 1, 1);
+}
+
+function goPrev(){
+  if(!isOpen || flipping) return;
+  if(idx <= 0) return;
+  turn(idx - 1, -1);
+}
+
+/* keyboard */
+document.addEventListener('keydown', function(e){
+  if(e.target && e.target.classList && e.target.classList.contains('redact')){
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); e.target.click(); return; }
+  }
+  if(!isOpen) {
+    if(e.key === 'Enter' && document.activeElement === openBtn){ return; }
+    return;
+  }
+  if(e.key === 'ArrowLeft'){ e.preventDefault(); goNext(); }
+  else if(e.key === 'ArrowRight'){ e.preventDefault(); goPrev(); }
+  else if(e.key === 'Escape'){ e.preventDefault(); closeFile(); }
+});
+
+/* ============================================================
+   9. TOUCH SWIPE — الصفحة تتبع الصباع
+   ============================================================ */
+
+let tStartX = 0, tStartY = 0, tActive = false;
+
+pagesArea.addEventListener('touchstart', function(e){
+  if(e.touches.length !== 1) return;
+  tStartX = e.touches[0].clientX;
+  tStartY = e.touches[0].clientY;
+  tActive = true;
+}, { passive: true });
+
+pagesArea.addEventListener('touchend', function(e){
+  if(!tActive) return;
+  tActive = false;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - tStartX;
+  const dy = t.clientY - tStartY;
+
+  if(Math.abs(dx) < 48) return;
+  if(Math.abs(dx) < Math.abs(dy) * 1.3) return;
+
+  /* RTL: سحب لليمين = الصفحة الجاية (زي قلب الورقة الحقيقية) */
+  if(dx > 0) goNext();
+  else goPrev();
+}, { passive: true });
+
+/* ============================================================
+   10. REDACTIONS + IN-PAGE ACTIONS
+   ============================================================ */
+
+pagesArea.addEventListener('click', function(e){
+  const nav = e.target.closest('[data-nav]');
+  if(nav){
+    if(nav.dataset.nav === 'next') goNext();
+    else goPrev();
+    return;
+  }
+  const red = e.target.closest('.redact');
+  if(red){
+    red.classList.toggle('revealed');
+    checkAllRevealed(red);
+    sound('click');
+    return;
+  }
+  const closer = e.target.closest('[data-action="close-file"]');
+  if(closer){ closeFile(); }
+});
+
+function checkAllRevealed(el){
+  const page = el.closest('.page');
+  if(!page) return;
+  const all  = page.querySelectorAll('.redact');
+  const done = page.querySelectorAll('.redact.revealed');
+  if(all.length && all.length === done.length){
+    const fin = page.querySelector('.redact-final');
+    if(fin) fin.classList.add('show');
+  }
+}
+
+/* ============================================================
+   11. SOUND (WebAudio — enabled by default on first interaction)
+   ============================================================ */
+
+let audioCtx = null;
+let soundOn = true;
+const pageTurnForwardAudio = new Audio('assets/Flipping%20Page%20Forward.mp3');
+const pageTurnBackAudio = new Audio('assets/Flipping%20Page%20Back.mp3');
+pageTurnForwardAudio.preload = 'auto';
+pageTurnBackAudio.preload = 'auto';
+pageTurnForwardAudio.volume = 0.8;
+pageTurnBackAudio.volume = 0.8;
+
+function ensureAudio(){
+  if(audioCtx) return audioCtx;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if(!AC) return null;
+  try { audioCtx = new AC(); } catch(err){ audioCtx = null; }
+  return audioCtx;
+}
+
+function noiseBurst(dur, freq, gain, q){
+  const ctx = ensureAudio();
+  if(!ctx) return;
+  const play = function(){
+    const len = Math.max(1, Math.floor(ctx.sampleRate * dur));
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for(let i = 0; i < len; i++){
+      const env = Math.pow(1 - i / len, 2.3);
+      data[i] = (Math.random() * 2 - 1) * env;
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = freq;
+    bp.Q.value = q || 0.9;
+
+    const g = ctx.createGain();
+    g.gain.value = gain;
+
+    src.connect(bp);
+    bp.connect(g);
+    g.connect(ctx.destination);
+    src.start();
+  };
+  if(ctx.state === 'suspended'){
+    ctx.resume().then(play).catch(function(err){ console.error('Unable to resume audio:', err); });
+    return;
+  }
+  play();
+}
+
+function sound(kind){
+  if(!soundOn) return;
+  switch(kind){
+    case 'open':
+    case 'forward':
+    case 'back': {
+      const audio = kind === 'back' ? pageTurnBackAudio : pageTurnForwardAudio;
+      audio.pause();
+      audio.currentTime = 0;
+      audio.play().catch(function(err){ console.error('Unable to play page-turn sound:', err); });
+      break;
+    }
+    case 'close': noiseBurst(0.42, 700, 0.05, 0.7); break;
+    case 'click': noiseBurst(0.05, 2600, 0.03, 1.6); break;
+  }
+}
+
+soundBtn.addEventListener('click', function(){
+  soundOn = !soundOn;
+  soundBtn.textContent = soundOn ? 'SOUND: ON' : 'SOUND: OFF';
+  soundBtn.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+  if(soundOn){
+    ensureAudio();
+    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    sound('turn');
+  }
+});
+
+/* ============================================================
+   12. BOOT
+   ============================================================ */
+
+document.getElementById('coverFileNo').textContent  = DOSSIER.fileNumber;
+document.getElementById('coverTab').textContent     = 'FILE ' + DOSSIER.fileNumber;
+document.getElementById('coverSubject').innerHTML   = fmt(DOSSIER.subject);
+document.getElementById('coverClass').textContent   = DOSSIER.classification;
+document.getElementById('coverStatus').textContent  = DOSSIER.status;
+document.getElementById('coverNote').textContent    = DOSSIER.coverNote;
+
+sheetBase.innerHTML = pageHTML(0);
+updateUI();
+
+/* أول حساب للمقاس بعد ما الخطوط تحمّل */
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(function(){ fit(); });
+}
+window.addEventListener('load', fit);
+requestAnimationFrame(function(){ fit(); setTimeout(fit, 120); });
+
+})();
+</script>
+</body>
+</html>
